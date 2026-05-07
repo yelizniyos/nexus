@@ -290,9 +290,13 @@ def main():
     application.add_handler(MessageHandler(filters.Regex(r'(?i)^(TYT:|AYT:)'), isle_deneme_girisi))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 
-    job_queue = application.job_queue
-    job_queue.run_daily(sabah_gorevi, time=time(8, 0, tzinfo=TR_TIMEZONE))
-    job_queue.run_daily(aksam_gorevi, time=time(23, 0, tzinfo=TR_TIMEZONE))
+   # Zamanlayıcıyı kontrol ederek başlat
+    if application.job_queue:
+        application.job_queue.run_daily(sabah_gorevi, time=time(8, 0, tzinfo=TR_TIMEZONE))
+        application.job_queue.run_daily(aksam_gorevi, time=time(23, 0, tzinfo=TR_TIMEZONE))
+        print("✅ Zamanlayıcı başarıyla kuruldu.")
+    else:
+        print("⚠️ Uyarı: JobQueue (zamanlayıcı) hazır değil. Bot çalışacak ama sabah mesajları gelmeyebilir.")
 
     print("✅ Nexus Botu Başlatıldı...")
     application.run_polling()
